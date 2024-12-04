@@ -25,14 +25,14 @@ fun main() {
 
     fun part2(input: List<String>): Int {
         fun makePermutations(report: List<Int>): List<List<Int>> {
-            return (0..report.size).map{ maskIdx -> report.filterIndexed{ idx, n -> maskIdx !== idx }}
+            return (0..report.size).map{ maskIdx -> report.filterIndexed{ idx, n -> maskIdx != idx }}
         }
 
         val reports = input.map{ it.split(Regex("\\s+")).map{ it.toInt()} }
         val unsafeReports = reports.filter{ !isSafe(it) }
         val permutedReports = unsafeReports.map{ makePermutations(it)}
         val eventuallySafe = permutedReports.filter{
-            reportPermutations -> null !== reportPermutations.find{
+            reportPermutations -> null != reportPermutations.find{
                 permutedReport -> isSafe(permutedReport)
             }
         }
