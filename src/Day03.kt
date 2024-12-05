@@ -16,14 +16,14 @@ fun main() {
 
     fun part2(input: List<String>): Long {
         val code = input.joinToString(separator = "")
-        val regex = Regex("(?:mul\\((\\d{1,3}),(\\d{1,3})\\))|(don't|do)")
+        val regex = Regex("(?:mul\\((\\d{1,3}),(\\d{1,3})\\))|(don't\\(\\)|do\\(\\))")
         val matchResult = regex.findAll(code)
         var pairs: List<Pair<Long, Long>> = listOf<Pair<Long, Long>>()
         var doing = true
         matchResult.forEach{ match ->
-            if (match.value == "do")
+            if (match.value == "do()")
                 doing = true
-            else if (match.value == "don't")
+            else if (match.value == "don't()")
                 doing = false
             else if (doing)
                 pairs = pairs + Pair(match.groups?.get(1)?.value?.toLong()!!, match.groups?.get(2)?.value?.toLong()!!)
