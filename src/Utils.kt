@@ -21,3 +21,5 @@ fun String.md5() = BigInteger(1, MessageDigest.getInstance("MD5").digest(toByteA
 fun Any?.println() = println(this)
 
 fun List<String>.concat() = this.joinToString(separator = "")
+
+fun Char.repeat(count: Int): String = this.toString().repeat(count)
