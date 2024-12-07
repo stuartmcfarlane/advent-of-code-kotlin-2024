@@ -1,1 +1,1 @@
-Day05.kt
+Day06.kt
