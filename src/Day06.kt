@@ -45,6 +45,9 @@ fun main() {
             if (cell == null) return or
             return cell
         }
+        fun getOr(cell: Cell, or: T): T {
+            return getOr(cell.x, cell.y, or)
+        }
         fun get(cell: Cell): T {
             return get(cell.x, cell.y)
         }
@@ -60,21 +63,24 @@ fun main() {
         }
     }
     class Room {
-        val grid: Grid<Boolean>
+        val grid: Grid<Char>
         val startPosition: Cell
         val startDirection: Cell
 
-        constructor(_grid: Grid<Boolean>, _startPosition: Cell, _startDirection: Cell = Cell(0, -1) ) {
+        constructor(_grid: Grid<Char>, _startPosition: Cell, _startDirection: Cell = Cell(0, -1) ) {
             grid = _grid
             startPosition = _startPosition
             startDirection = _startDirection
         }
         constructor(input: List<String>) {
-            grid = Grid(input, { it == '#'})
+            grid = Grid(input, { it })
             val y = input.indexOfFirst{ it.contains('^')}
             val x = input.get(y).indexOf('^')
             startPosition = Cell(x, y)
             startDirection = Cell(0, -1)
+        }
+        fun get(cell: Cell): Char {
+            return grid.getOr(cell.x, cell.y, '?')
         }
         fun step(direction: Cell, position: Cell): Cell {
             return Cell(position.x + direction.x, position.y + direction.y)
@@ -86,8 +92,8 @@ fun main() {
             var position = startPosition
             var direction = startDirection
             var path: List<Pair<Cell, Cell>> = listOf<Pair<Cell, Cell>>()
-            while (!path.isLoop() && grid.getOrNull(position) != null) {
-                if (true == grid.getOrNull(step(direction, position))) {
+            while (!path.isLoop() && get(position) != '?') {
+                if ('#' == get(step(direction, position))) {
                     direction = turn(direction)
                 }
                 path = path + Pair(position, direction)
@@ -101,7 +107,7 @@ fun main() {
             var path: MutableList<Pair<Cell, Cell>> = mutableListOf()
             var nodeSet: MutableSet<Pair<Cell, Cell>> = mutableSetOf()
             while (grid.getOrNull(position) != null) {
-                if (true == grid.getOrNull(step(direction, position))) {
+                if ('#' == get(step(direction, position))) {
                     direction = turn(direction)
                 }
                 val node = Pair(position, direction)
@@ -115,7 +121,7 @@ fun main() {
         fun println() {
             (0..grid.height-1).forEach{
                 y -> (0..grid.width-1).map{
-                    x -> if (x == startPosition.x && y == startPosition.y) '^' else if (grid.getOr(x, y, false)) '#' else '.'
+                    x -> if (x == startPosition.x && y == startPosition.y) '^' else get(Cell(x, y))
                 }.joinToString("").println()
             }
         }
@@ -130,7 +136,7 @@ fun main() {
 
         basePath.forEach{ 
             val (position, _) = it
-            val nextMap = Room(Grid<Boolean>(grid, position, true), room.startPosition, room.startDirection)
+            val nextMap = Room(Grid<Char>(grid, position, '#'), room.startPosition, room.startDirection)
             println(--count)
             yield( Pair(position, nextMap) )
         }
@@ -149,8 +155,7 @@ fun main() {
             if (Cell(x, y) == room.startPosition) return '^' 
             if (added == Cell(x, y)) return 'O' 
             if (pathSet.contains(Cell(x, y))) return '+'
-            if (true == room.grid.get(x, y)) return '#' 
-            return '.'
+            return room.get(Cell(x, y))
         }
         Grid<Char>(room.grid.width, room.grid.height, { x, y -> makeCell(x, y) }).println()
     }
