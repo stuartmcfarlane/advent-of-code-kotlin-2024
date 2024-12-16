@@ -27,26 +27,41 @@ fun main() {
         return stones.size
     }
 
-    fun part2(input: List<String>, length: Int = 75): Int {
-        fun blink(blinksRemaining: Int, stone: BigInteger): Int {
-            if (blinksRemaining == 0) {
-                return 1
-            }
-            if (stone == 0.toBigInteger()) return blink(blinksRemaining - 1, 1.toBigInteger())
-            if (hasEvenDigits(stone)) return splitStone(stone).map{ blink(blinksRemaining - 1, it)}.sum()
-            return blink(blinksRemaining - 1, stone * 2024.toBigInteger())
+    fun part2(input: List<String>, targetDepth: Int = 75): Long {
+
+        var cache = mutableMapOf<Pair<BigInteger, Int>, Long>()
+
+        fun splitStone(stone: BigInteger): List<BigInteger> {
+            val stoneStr = "$stone"
+            val digits = stoneStr.length
+            if (stone == 0.toBigInteger()) return listOf(1.toBigInteger())
+            if (digits % 2 == 1) return listOf(stone * 2024.toBigInteger())
+            return stoneStr.chunked(digits / 2).map{ it.toBigInteger() }
         }
+        fun countStones(stone: BigInteger, depth: Int): Long {
+            val key = Pair(stone, depth)
+            println ("countStones $stone $depth")
+            val cached = cache.getOrDefault(key, null)
+            if (null != cached) println ("$stone $depth cached $cached")
+            return cache.getOrPut(key) {
+                val result = (
+                    if (depth == targetDepth)
+                        1L
+                    else
+                        splitStone(stone).map{ countStones(it, depth + 1) }.sum()
+                )
+                println("put $stone $depth $result")
+                return result
+            }
+        }
+       
         var stones = input.first().split(" ").map{ it.toBigInteger() }
-        val result = stones.map{ blink(length, it)}.sum()
-        return result
+        return stones.map{ countStones(it, 0) }.sum()
     }
-    val input = readInput("Day11_test")
-    // for (i in 1..75) {
-    //     println("$i ${part2(input, i)}")
-    // }
+    val input = readInput("Day11")
     
     val result1 = part1(input)
     println("part 1: $result1")
-    val result2 = part2(input)
+    val result2 = part2(input, 25)
     println("part 2: $result2")
 }
