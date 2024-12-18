@@ -19,25 +19,8 @@ fun main() {
             height = input.size
             width = input.map{ it.length }.max()
         }
-        constructor(_width: Int, _height: Int, cellInitializer: (x: Int, y: Int) -> T) {
-            width = _width
-            height = _height
-            cells = (0..height-1).map{
-                y -> (0..width-1).map{
-                    x -> cellInitializer(x, y)
-                }.toList()
-            }.toList()
-        }
-        constructor(grid: Grid<T>, cell: Cell, v: T) {
-            cells = grid.cells.mapIndexed{ y, row -> row.mapIndexed{ x, col -> if (x == cell.x && y == cell.y) v else grid.get(x, y)} }
-            height = grid.height
-            width = grid.width
-        }
         fun get(x: Int, y: Int): T {
             return cells.get(y).get(x)
-        }
-        fun getOrNull(x: Int, y: Int): T? {
-            return cells.getOrNull(y)?.getOrNull(x)
         }
         fun getOr(x: Int, y: Int, or: T): T {
             val cell = cells.getOrNull(y)?.getOrNull(x)
@@ -49,9 +32,6 @@ fun main() {
         }
         fun get(cell: Cell): T {
             return get(cell.x, cell.y)
-        }
-        fun getOrNull(cell: Cell): T? {
-            return getOrNull(cell.x, cell.y)
         }
         fun find(test: (t: T) -> Boolean): List<Cell> {
             var found = mutableListOf<Cell>()
