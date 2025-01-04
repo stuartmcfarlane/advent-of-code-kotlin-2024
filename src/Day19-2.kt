@@ -119,9 +119,31 @@ fun main() {
             return Array(nodes.size) { nodes[it] }
         }
         fun countExactCovers(nodes: Array<Node>): Long {
+            var tracerCount = 0L
             var count = 0L
             var removed = mutableListOf<Pair<Char, Int>>()
+            var tries = mutableListOf<Int>()
+
+            fun fmtTries(): String {
+                return tries.map{
+                    var option = it
+                    var str = mutableListOf<Char>()
+                    do {
+                        str.add(nodes[option].ch)
+                        option = nodes[option].right
+                    } while (nodes[option].ch != EOL)
+                    str.joinToString("")
+                }.joinToString(":")
+            }
+
+            fun tracer() {
+                tracerCount++
+                if (tracerCount % 1000000000 == 0L) {
+                    println("$tracerCount: $count ${fmtTries()}")
+                }
+            }
             fun deleteOption(option: Int) {
+                tracer()
                 // debug("delete option $option | ${nodes[option].ch}")
                 removed.push('o' to option)
                 val up = nodes[option].up
@@ -131,6 +153,7 @@ fun main() {
                 printNodes(nodes)
             }
             fun insertOption(option: Int) {
+                tracer()
                 // debug("insert option $option | ${nodes[option].ch}")
                 val up = nodes[option].up
                 val down = nodes[option].down
@@ -139,6 +162,7 @@ fun main() {
                 printNodes(nodes)
             }
             fun deleteItem(item: Int) {
+                tracer()
                 // debug("delete item $item | ${nodes[item].ch}")
                 removed.push('i' to item)
                 val left = nodes[item].left
@@ -148,6 +172,7 @@ fun main() {
                 printNodes(nodes)
             }
             fun insertItem(item: Int) {
+                tracer()
                 // debug("insert item $item | ${nodes[item].ch}")
                 val left = nodes[item].left
                 val right = nodes[item].right
@@ -155,19 +180,8 @@ fun main() {
                 nodes[right].left = item
                 printNodes(nodes)
             }
-            var tries = mutableListOf<Int>()
             fun printTries() {
-                // debug(
-                //     tries.map{
-                //         var option = it
-                //         var str = mutableListOf<Char>()
-                //         do {
-                //             str.add(nodes[option].ch)
-                //             option = nodes[option].right
-                //         } while (nodes[option].ch != EOL)
-                //         str.joinToString("")
-                //     }
-                // )
+                // debug(fmtTries())
             }
             fun emitCover() {
                 printTries()
